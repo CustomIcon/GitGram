@@ -3,13 +3,11 @@
 from logging import basicConfig, getLogger, INFO
 from flask import Flask, request, jsonify
 from html import escape
-from telegram import Bot
 from requests import get, post
-from telegram import ReplyKeyboardMarkup
 from os import environ
 import config
 
-from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+from telegram.ext import CommandHandler, Updater
 
 
 server = Flask(__name__)
@@ -34,7 +32,7 @@ dispatcher = updater.dispatcher
 print("If you need more information contact @YorktownEagleUnion")
 
 
-def start(bot, update):
+def start(_bot, update):
     message = update.effective_message
     message.reply_text(
         f"This is the Updates watcher for {PROJECT_NAME}\nYou are not authorized to be here",
