@@ -20,7 +20,7 @@
             "value": ""
         },
         "PROJECT_NAME": {
-            "description": "Get from https://my.telegram.org",
+            "description": "Project of what you desire",
             "value": ""
         },
         "ip_addr": {
