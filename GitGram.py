@@ -259,14 +259,11 @@ def git_api(groupid):
 
 def deldog(data):
     BASE_URL = 'https://del.dog'
-    message = update.effective_message
     r = post(f'{BASE_URL}/documents', data=str(data).encode('utf-8'))
     if r.status_code == 404:
-        message.reply_text('Failed to reach dogbin')
         r.raise_for_status()
     res = r.json()
     if r.status_code != 200:
-        message.reply_text(res['message'])
         r.raise_for_status()
     key = res['key']
     if res['isUrl']:
