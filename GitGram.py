@@ -3,13 +3,11 @@
 from logging import basicConfig, getLogger, INFO
 from flask import Flask, request, jsonify
 from html import escape
-from telegram import Bot
 from requests import get, post
-from telegram import ReplyKeyboardMarkup
 from os import environ
 import config
 
-from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+from telegram.ext import CommandHandler, Updater
 
 
 server = Flask(__name__)
