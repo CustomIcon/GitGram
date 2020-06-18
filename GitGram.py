@@ -34,7 +34,7 @@ dispatcher = updater.dispatcher
 print("If you need more information contact @YorktownEagleUnion")
 
 
-def start(bot, update):
+def start(_bot, update):
     message = update.effective_message
     message.reply_text(
         f"This is the Updates watcher for {PROJECT_NAME}\nYou are not authorized to be here",
