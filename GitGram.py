@@ -33,6 +33,7 @@ print("If you need more information contact @YorktownEagleUnion")
 
 
 def start(_bot, update):
+    """/start message for bot"""
     message = update.effective_message
     message.reply_text(
         f"This is the Updates watcher for {PROJECT_NAME}\nYou are not authorized to be here",
@@ -56,6 +57,7 @@ else:
 
 
 def post_tg(chat, message, parse_mode):
+    """Send message to desired group"""
     response = post(
         TG_BOT_API + "sendMessage",
         params={
@@ -67,6 +69,7 @@ def post_tg(chat, message, parse_mode):
 
 
 def reply_tg(chat, message_id, message, parse_mode):
+    """reply to message_id"""
     response = post(
         TG_BOT_API + "sendMessage",
         params={
@@ -80,6 +83,7 @@ def reply_tg(chat, message_id, message, parse_mode):
 
 @server.route("/<groupid>", methods=['GET', 'POST'])
 def git_api(groupid):
+    """Requests to api.github.com"""
     data = request.json
     if not data:
         return f"<b>Add this url:</b> {ip_addr}/{groupid} to webhooks of the project"
@@ -256,6 +260,7 @@ def git_api(groupid):
 
 
 def deldog(data):
+    """Pasing the stings to del.dog"""
     BASE_URL = 'https://del.dog'
     r = post(f'{BASE_URL}/documents', data=str(data).encode('utf-8'))
     if r.status_code == 404:
