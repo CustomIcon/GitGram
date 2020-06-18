@@ -111,14 +111,14 @@ def git_api(groupid):
                 commit_msg = escape(commit['message'])
             commits_text += f"{commit_msg}\n<a href='{commit['url']}'>{commit['id'][:7]}</a> - {commit['author']['name']} {escape('<')}{commit['author']['email']}{escape('>')}\n\n"
             if len(commits_text) > 1000:
-                text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split("/")[-1])})
+                text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
 {commits_text}
 """
                 response = post_tg(groupid, text, "html")
                 commits_text = ""
         if not commits_text:
             return jsonify({"ok": True, "text": "Commits text is none"})
-        text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split("/")[-1])})
+        text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
 {commits_text}
 """
         if len(data['commits']) > 10:
@@ -212,13 +212,13 @@ def git_api(groupid):
 
     if data.get('deleted'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split("/")[-1]} <b>{data['ref'].split("/")[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was deleted by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was deleted by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
     if data.get('forced'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split("/")[-1]} <b>{data['ref'].split("/")[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was forced by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was forced by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
