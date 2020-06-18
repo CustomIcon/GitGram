@@ -46,8 +46,7 @@ start_handler = CommandHandler("start", start)
 dispatcher.add_handler(start_handler)
 updater.start_polling()
 
-TG_BOT_API = 'https://api.telegram.org/bot{}/'.format(BOT_TOKEN)
-
+TG_BOT_API = f'https://api.telegram.org/bot{BOT_TOKEN}/'
 checkbot = get(TG_BOT_API + "getMe").json()
 if not checkbot['ok']:
     log.error("Invalid Token!")
@@ -112,111 +111,80 @@ def git_api(groupid):
                 commit_msg = escape(commit['message'])
             commits_text += f"{commit_msg}\n<a href='{commit['url']}'>{commit['id'][:7]}</a> - {commit['author']['name']} {escape('<')}{commit['author']['email']}{escape('>')}\n\n"
             if len(commits_text) > 1000:
-                text = """✨ <b>{}</b> - New {} commits ({})
-{}
-""".format(escape(data['repository']['name']), len(data['commits']), escape(data['ref'].split("/")[-1]), commits_text)
+                text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
+{commits_text}
+"""
                 response = post_tg(groupid, text, "html")
                 commits_text = ""
         if not commits_text:
             return jsonify({"ok": True, "text": "Commits text is none"})
-        text = """✨ <b>{}</b> - New {} commits ({})
-{}
-""".format(escape(data['repository']['name']), len(data['commits']), escape(data['ref'].split("/")[-1]), commits_text)
+        text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
+{commits_text}
+"""
         if len(data['commits']) > 10:
-            text += "\n\n<i>And {} other commits</i>".format(
-                len(data['commits']) - 10)
+            text += f"\n\n<i>And {len(data['commits']) - 10} other commits</i>"
         response = post_tg(groupid, text, "html")
         return response
 
     if data.get('issue'):
         if data.get('comment'):
-            text = """💬 New comment: <b>{}</b>
-{}
+            text = f"""💬 New comment: <b>{escape(data['repository']['name'])}</b>
+{escape(data['comment']['body'])}
 
-<a href='{}'>Issue #{}</a>
-""".format(escape(data['repository']['name']), escape(data['comment']['body']), data['comment']['html_url'], data['issue']['number'])
+<a href='{data['comment']['html_url']}'>Issue #{data['issue']['number']}</a>
+"""
             response = post_tg(groupid, text, "html")
             return response
-        text = """🚨 New {} issue for <b>{}</b>
-<b>{}</b>
-{}
+        text = f"""🚨 New {data['action']} issue for <b>{escape(data['repository']['name'])}</b>
+<b>{escape(data['issue']['title'])}</b>
+{escape(data['issue']['body'])}
 
-<a href='{}'>issue #{}</a>
-""".format(data['action'], escape(data['repository']['name']), escape(data['issue']['title']), escape(data['issue']['body']), data['issue']['html_url'], data['issue']['number'])
+<a href='{data['issue']['html_url']}'>issue #{data['issue']['number']}</a>
+"""
         response = post_tg(groupid, text, "html")
         return response
 
     if data.get('pull_request'):
         if data.get('comment'):
-            text = """❗ There is a new pull request for <b>{}</b> ({})
-{}
+            text = f"""❗ There is a new pull request for <b>{escape(data['repository']['name'])}</b> ({data['pull_request']['state']})
+{escape(data['comment']['body'])}
 
-<a href='{}'>Pull request #{}</a>
-""".format(escape(data['repository']['name']), data['pull_request']['state'], escape(data['comment']['body']), data['comment']['html_url'], data['issue']['number'])
+<a href='{data['comment']['html_url']}'>Pull request #{data['issue']['number']}</a>
+"""
             response = post_tg(groupid, text, "html")
             return response
-        text = """❗  New {} pull request for <b>{}</b>
-<b>{}</b> ({})
-{}
+        text = f"""❗  New {data['action']} pull request for <b>{escape(data['repository']['name'])}</b>
+<b>{escape(data['pull_request']['title'])}</b> ({data['pull_request']['state']})
+{escape(data['pull_request']['body'])}
 
-<a href='{}'>Pull request #{}</a>
-""".format(data['action'], escape(data['repository']['name']), escape(data['pull_request']['title']), data['pull_request']['state'], escape(data['pull_request']['body']), data['pull_request']['html_url'], data['pull_request']['number'])
+<a href='{data['pull_request']['html_url']}'>Pull request #{data['pull_request']['number']}</a>
+"""
         response = post_tg(groupid, text, "html")
         return response
 
     if data.get('forkee'):
         response = post_tg(
             groupid,
-            "🍴 <a href='{}'>{}</a> forked <a href='{}'>{}</a>!\nTotal forks now are {}".format(
-                data['sender']['html_url'],
-                data['sender']['login'],
-                data['repository']['html_url'],
-                data['repository']['name'],
-                data['repository']['forks_count']),
+            f"🍴 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> forked <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal forks now are {data['repository']['forks_count']}",
             "html")
         return response
 
     if data.get('action'):
 
         if data.get('action') == "published" and data.get('release'):
-            text = "<a href='{}'>{}</a> {} <a href='{}'>{}</a>!".format(
-                data['sender']['html_url'],
-                data['sender']['login'],
-                data['action'],
-                data['repository']['html_url'],
-                data['repository']['name'])
-            text += "\n\n<b>{}</b> ({})\n{}\n\n<a href='{}'>Download tar</a> | <a href='{}'>Download zip</a>".format(
-                data['release']['name'],
-                data['release']['tag_name'],
-                data['release']['body'],
-                data['release']['tarball_url'],
-                data['release']['zipball_url'])
+            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
+            text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
             response = post_tg(groupid, text, "html")
             return response
 
         if data.get('action') == "started":
-            text = "🌟 <a href='{}'>{}</a> gave a star to <a href='{}'>{}</a>!\nTotal stars are now {}".format(
-                data['sender']['html_url'],
-                data['sender']['login'],
-                data['repository']['html_url'],
-                data['repository']['name'],
-                data['repository']['stargazers_count'])
+            text = f"🌟 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> gave a star to <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal stars are now {data['repository']['stargazers_count']}"
             response = post_tg(groupid, text, "html")
             return response
 
         if data.get('action') == "edited" and data.get('release'):
-            text = "<a href='{}'>{}</a> {} <a href='{}'>{}</a>!".format(
-                data['sender']['html_url'],
-                data['sender']['login'],
-                data['action'],
-                data['repository']['html_url'],
-                data['repository']['name'])
-            text += "\n\n<b>{}</b> ({})\n{}\n\n<a href='{}'>Download tar</a> | <a href='{}'>Download zip</a>".format(
-                data['release']['name'],
-                data['release']['tag_name'],
-                data['release']['body'],
-                data['release']['tarball_url'],
-                data['release']['zipball_url'])
+            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
+            text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
             response = post_tg(groupid, text, "html")
             return response
 
@@ -225,66 +193,37 @@ def git_api(groupid):
 
         response = post_tg(
             groupid,
-            "<a href='{}'>{}</a> {} <a href='{}'>{}</a>!".format(
-                data['sender']['html_url'],
-                data['sender']['login'],
-                data['action'],
-                data['repository']['html_url'],
-                data['repository']['name']),
+            f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!",
             "html")
         return response
 
     if data.get('ref_type'):
         response = post_tg(
             groupid,
-            "A new {} on <a href='{}'>{}</a> was created by <a href='{}'>{}</a>!".format(
-                data['ref_type'],
-                data['repository']['html_url'],
-                data['repository']['name'],
-                data['sender']['html_url'],
-                data['sender']['login']),
+            f"A new {data['ref_type']} on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
             "html")
         return response
 
     if data.get('created'):
         response = post_tg(groupid,
-                           "Branch {} <b>{}</b> on <a href='{}'>{}</a> was created by <a href='{}'>{}</a>!".format(data['ref'].split("/")[-1],
-                                                                                                                   data['ref'].split("/")[-2],
-                                                                                                                   data['repository']['html_url'],
-                                                                                                                   data['repository']['name'],
-                                                                                                                   data['sender']['html_url'],
-                                                                                                                   data['sender']['login']),
+            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
     if data.get('deleted'):
         response = post_tg(groupid,
-                           "Branch {} <b>{}</b> on <a href='{}'>{}</a> was deleted by <a href='{}'>{}</a>!".format(data['ref'].split("/")[-1],
-                                                                                                                   data['ref'].split("/")[-2],
-                                                                                                                   data['repository']['html_url'],
-                                                                                                                   data['repository']['name'],
-                                                                                                                   data['sender']['html_url'],
-                                                                                                                   data['sender']['login']),
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was deleted by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
     if data.get('forced'):
         response = post_tg(groupid,
-                           "Branch {} <b>{}</b> on <a href='{}'>{}</a> was forced by <a href='{}'>{}</a>!".format(data['ref'].split("/")[-1],
-                                                                                                                  data['ref'].split("/")[-2],
-                                                                                                                  data['repository']['html_url'],
-                                                                                                                  data['repository']['name'],
-                                                                                                                  data['sender']['html_url'],
-                                                                                                                  data['sender']['login']),
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was forced by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
     if data.get('pages'):
-        text = "<a href='{}'>{}</a> wiki pages were updated by <a href='{}'>{}</a>!\n\n".format(
-            data['repository']['html_url'],
-            data['repository']['name'],
-            data['sender']['html_url'],
-            data['sender']['login'])
+        text = f"<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> wiki pages were updated by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!\n\n"
         for x in data['pages']:
             summary = ""
             if x['summary']:
@@ -313,7 +252,7 @@ def git_api(groupid):
     url = deldog(data)
     response = post_tg(
         groupid,
-        "🚫 Undetected response: {}".format(url),
+        f"🚫 Undetected response: {url}",
         "markdown")
     return response
 
