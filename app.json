@@ -1,0 +1,31 @@
+{
+    "name": "GitGram",
+    "description": "Github Interigation for Telegram Bot API",
+    "logo": "",
+    "keywords": [
+        "telegram",
+        "github"
+    ],
+    "repository": "https://github.com/pokurt/GitGram",
+    "website": "https://t.me/LyndaEagleSupport",
+    "success_url": "https://t.me/YorkTownEagleUnion",
+    "stack": "container",
+    "env": {
+        "ENV": {
+            "description": "Fill this if you using environ variable as config.",
+            "value": "True"
+        },
+        "BOT_TOKEN": {
+            "description": "Get Bot API Token from @BotFather",
+            "value": ""
+        },
+        "PROJECT_NAME": {
+            "description": "Get from https://my.telegram.org",
+            "value": ""
+        },
+        "ip_addr": {
+            "description": "Heroku app url, example: https://appname.herokuapp.com",
+            "value": ""
+        }
+    }
+  }
