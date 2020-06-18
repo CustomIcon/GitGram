@@ -206,7 +206,7 @@ def git_api(groupid):
 
     if data.get('created'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split("/")[-1]} <b>{data['ref'].split("/")[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
