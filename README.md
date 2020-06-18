@@ -1,4 +1,4 @@
-# GitGram - Github Interigation for Telegram Bot API
+# GitGram - Github Integration for Telegram Bot API
 
 # Setup:
 - Install all requirements, `pip3 install -r requirements.txt`
