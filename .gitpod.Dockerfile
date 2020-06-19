@@ -1,5 +1,7 @@
+@ -1,9 +1,37 @@
 FROM gitpod/workspace-full
 
+USER gitpod
 # Installing Required Packages
 RUN apt update && apt upgrade -y && \
     apt install --no-install-recommends -y \
@@ -25,6 +27,7 @@ RUN apt update && apt upgrade -y && \
     libreadline-dev \
     libyaml-dev \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp
+
 
 # Pypi package Repo upgrade
 RUN pip3 install --upgrade pip setuptools
