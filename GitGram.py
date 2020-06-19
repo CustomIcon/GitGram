@@ -93,6 +93,14 @@ def git_api(groupid):
         repo_name = data['repository']['name']
         sender_url = data['sender']['html_url']
         sender_name = data['sender']['login']
+        comments = data['comment']['body']
+        commits_data = len(data['commits']
+        comment_url = data['comment']['html_url']
+        issue_no = data['issue']['number']
+        issue_title = data['issue']['title']
+        issue = data['issue']['body']
+        issue_url = data['issue']['html_url']
+        pr_state = data['pull_request']['state']
         response = post_tg(
                 groupid,
                 f"🙌 Successfully set webhook for <a href='{repo_url}'>{repo_name}</a> by <a href='{sender_url}'>{sender_name}</a>!",
@@ -102,7 +110,7 @@ def git_api(groupid):
 
     if data.get('commits'):
         commits_text = ""
-        rng = len(data['commits'])
+        rng = commits_data
         if rng > 10:
             rng = 10
         for x in range(rng):
@@ -113,50 +121,51 @@ def git_api(groupid):
                 commit_msg = escape(commit['message'])
             commits_text += f"{commit_msg}\n<a href='{commit['url']}'>{commit['id'][:7]}</a> - {commit['author']['name']} {escape('<')}{commit['author']['email']}{escape('>')}\n\n"
             if len(commits_text) > 1000:
-                text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
+                text = f"""✨ <b>{escape(repo_name)}</b> - New {commits_data} commits ({escape(data['ref'].split('/')[-1])})
 {commits_text}
 """
                 response = post_tg(groupid, text, "html")
                 commits_text = ""
         if not commits_text:
             return jsonify({"ok": True, "text": "Commits text is none"})
-        text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
+        ref_data = escape(data['ref'].split('/')[-1])
+        text = f"""✨ <b>{repo_name}</b> - New {commits_data} commits ({ref_data})
 {commits_text}
 """
-        if len(data['commits']) > 10:
-            text += f"\n\n<i>And {len(data['commits']) - 10} other commits</i>"
+        if commits_data > 10:
+            text += f"\n\n<i>And {commits_data - 10} other commits</i>"
         response = post_tg(groupid, text, "html")
         return response
 
     if data.get('issue'):
         if data.get('comment'):
-            text = f"""💬 New comment: <b>{escape(data['repository']['name'])}</b>
-{escape(data['comment']['body'])}
+            text = f"""💬 New comment: <b>{escape(repo_name)}</b>
+{escape(comments)}
 
-<a href='{data['comment']['html_url']}'>Issue #{data['issue']['number']}</a>
+<a href='{comment_url}'>Issue #{issue_no}</a>
 """
             response = post_tg(groupid, text, "html")
             return response
-        text = f"""🚨 New {data['action']} issue for <b>{escape(data['repository']['name'])}</b>
-<b>{escape(data['issue']['title'])}</b>
-{escape(data['issue']['body'])}
+        text = f"""🚨 New {data['action']} issue for <b>{escape(repo_name)}</b>
+<b>{escape(issue_title)}</b>
+{escape(issue)}
 
-<a href='{data['issue']['html_url']}'>issue #{data['issue']['number']}</a>
+<a href='{issue_url}'>issue #{issue_no}</a>
 """
         response = post_tg(groupid, text, "html")
         return response
 
     if data.get('pull_request'):
         if data.get('comment'):
-            text = f"""❗ There is a new pull request for <b>{escape(data['repository']['name'])}</b> ({data['pull_request']['state']})
-{escape(data['comment']['body'])}
+            text = f"""❗ There is a new pull request for <b>{escape(repo_name)}</b> ({pr_state})
+{escape(comments)}
 
-<a href='{data['comment']['html_url']}'>Pull request #{data['issue']['number']}</a>
+<a href='{comment_url}'>Pull request #{issue_no}</a>
 """
             response = post_tg(groupid, text, "html")
             return response
-        text = f"""❗  New {data['action']} pull request for <b>{escape(data['repository']['name'])}</b>
-<b>{escape(data['pull_request']['title'])}</b> ({data['pull_request']['state']})
+        text = f"""❗  New {data['action']} pull request for <b>{escape(repo_name)}</b>
+<b>{escape(data['pull_request']['title'])}</b> ({pr_state})
 {escape(data['pull_request']['body'])}
 
 <a href='{data['pull_request']['html_url']}'>Pull request #{data['pull_request']['number']}</a>
@@ -167,25 +176,25 @@ def git_api(groupid):
     if data.get('forkee'):
         response = post_tg(
             groupid,
-            f"🍴 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> forked <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal forks now are {data['repository']['forks_count']}",
+            f"🍴 <a href='{sender_url}'>{sender_name}</a> forked <a href='{repo_url}'>{repo_name}</a>!\nTotal forks now are {data['repository']['forks_count']}",
             "html")
         return response
 
     if data.get('action'):
 
         if data.get('action') == "published" and data.get('release'):
-            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
+            text = f"<a href='{sender_url}'>{sender_name}</a> {data['action']} <a href='{repo_url}'>{repo_name}</a>!"
             text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
             response = post_tg(groupid, text, "html")
             return response
 
         if data.get('action') == "started":
-            text = f"🌟 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> gave a star to <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal stars are now {data['repository']['stargazers_count']}"
+            text = f"🌟 <a href='{sender_url}'>{sender_name}</a> gave a star to <a href='{repo_url}'>{repo_name}</a>!\nTotal stars are now {data['repository']['stargazers_count']}"
             response = post_tg(groupid, text, "html")
             return response
 
         if data.get('action') == "edited" and data.get('release'):
-            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
+            text = f"<a href='{sender_url}'>{sender_name}</a> {data['action']} <a href='{repo_url}'>{repo_name}</a>!"
             text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
             response = post_tg(groupid, text, "html")
             return response
@@ -195,37 +204,37 @@ def git_api(groupid):
 
         response = post_tg(
             groupid,
-            f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!",
+            f"<a href='{sender_url}'>{sender_name}</a> {data['action']} <a href='{repo_url}'>{repo_name}</a>!",
             "html")
         return response
 
     if data.get('ref_type'):
         response = post_tg(
             groupid,
-            f"A new {data['ref_type']} on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+            f"A new {data['ref_type']} on <a href='{repo_url}'>{repo_name}</a> was created by <a href='{sender_url}'>{sender_name}</a>!",
             "html")
         return response
 
     if data.get('created'):
         response = post_tg(groupid,
-            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was created by <a href='{sender_url}'>{sender_name}</a>!",
                            "html")
         return response
 
     if data.get('deleted'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was deleted by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was deleted by <a href='{sender_url}'>{sender_name}</a>!",
                            "html")
         return response
 
     if data.get('forced'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was forced by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was forced by <a href='{sender_url}'>{sender_name}</a>!",
                            "html")
         return response
 
     if data.get('pages'):
-        text = f"<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> wiki pages were updated by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!\n\n"
+        text = f"<a href='{repo_url}'>{repo_name}</a> wiki pages were updated by <a href='{sender_url}'>{sender_name}</a>!\n\n"
         for x in data['pages']:
             summary = ""
             if x['summary']:
@@ -247,7 +256,7 @@ def git_api(groupid):
             emo = "🌀"
         response = post_tg(
             groupid,
-            f"{emo} <a href='{data['target_url']}'>{data['description']}</a> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!\nLatest commit:\n<a href='{data['commit']['commit']['url']}'>{escape(data['commit']['commit']['message'])}</a>",
+            f"{emo} <a href='{data['target_url']}'>{data['description']}</a> on <a href='{repo_url}'>{repo_name}</a> by <a href='{sender_url}'>{sender_name}</a>!\nLatest commit:\n<a href='{data['commit']['commit']['url']}'>{escape(data['commit']['commit']['message'])}</a>",
             "html")
         return response
 
