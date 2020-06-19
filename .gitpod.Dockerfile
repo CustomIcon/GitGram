@@ -1,4 +1,3 @@
-@ -1,9 +1,37 @@
 FROM gitpod/workspace-full
 
 USER gitpod
