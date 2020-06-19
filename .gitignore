@@ -124,5 +124,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Configuration file
-config.py
+# Swap files on using Vi or Vim
+*.swp
