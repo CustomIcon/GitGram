@@ -5,8 +5,6 @@ USER gitpod
 # Installing Required Packages
 RUN apt update && apt upgrade -y && \
     apt install --no-install-recommends -y \
-    debian-keyring \
-    debian-archive-keyring \
     bash \
     bzip2 \
     curl \
