@@ -109,7 +109,6 @@ def git_api(groupid):
                 "html"
             )
         return response
-
     if data.get('commits'):
         commits_text = ""
         rng = commits_data
@@ -130,7 +129,6 @@ def git_api(groupid):
                 commits_text = ""
         if not commits_text:
             return jsonify({"ok": True, "text": "Commits text is none"})
-        
         text = f"""✨ <b>{repo_name}</b> - New {commits_data} commits ({ref_data1})
 {commits_text}
 """
