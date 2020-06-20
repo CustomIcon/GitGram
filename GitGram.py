@@ -113,8 +113,7 @@ def git_api(groupid):
                 commit_msg = escape(commit['message']).split("\n")[0]
             else:
                 commit_msg = escape(commit['message'])
-            commits_text += f"{commit_msg}\n<a href='{commit['url']}'>{commit['id'][:7]}</a> "+ 
-            "- {commit['author']['name']} {escape('<')}{commit['author']['email']}{escape('>')}\n\n"
+            commits_text += f"{commit_msg}\n<a href='{commit['url']}'>{commit['id'][:7]}</a> - {commit['author']['name']} {escape('<')}{commit['author']['email']}{escape('>')}\n\n"
             if len(commits_text) > 1000:
                 text = f"""✨ <b>{escape(data['repository']['name'])}</b> - New {len(data['commits'])} commits ({escape(data['ref'].split('/')[-1])})
 {commits_text}
@@ -179,26 +178,19 @@ def git_api(groupid):
     if data.get('action'):
 
         if data.get('action') == "published" and data.get('release'):
-            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']}" +
-                "<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
-            text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n" +
-                "<a href='{data['release']['tarball_url']}'>Download tar</a> | " +
-                "<a href='{data['release']['zipball_url']}'>Download zip</a>"
+            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
+            text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
             response = post_tg(groupid, text, "html")
             return response
 
         if data.get('action') == "started":
-            text = f"🌟 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> gave a " +
-                "star to <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal stars" +
-                " are now {data['repository']['stargazers_count']}"
+            text = f"🌟 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> gave a star to <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal stars are now {data['repository']['stargazers_count']}"
             response = post_tg(groupid, text, "html")
             return response
 
         if data.get('action') == "edited" and data.get('release'):
-            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} " +
-                "<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
-            text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n" +
-                "<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
+            text = f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!"
+            text += f"\n\n<b>{data['release']['name']}</b> ({data['release']['tag_name']})\n{data['release']['body']}\n\n<a href='{data['release']['tarball_url']}'>Download tar</a> | <a href='{data['release']['zipball_url']}'>Download zip</a>"
             response = post_tg(groupid, text, "html")
             return response
 
