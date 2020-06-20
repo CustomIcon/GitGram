@@ -36,25 +36,36 @@ def start(_bot, update):
     """/start message for bot"""
     message = update.effective_message
     message.reply_text(
-        f"This is the Updates watcher for {PROJECT_NAME}." +
-        "I'am just notify users about what's happen on ",
+        f"This is the Updates watcher for {PROJECT_NAME}. I am just notify users about what's happen on their Git repositories thru webhooks.\n\nYou need to [self-host](https://github.com/MadeByThePinsHub/GitGram#readme) or see /help to use this bot on your groups.",
         parse_mode="markdown")
+
+def help(_bot, update):
+    """/help message for the bot"""
+    message = update.effective_message
+    chat_id = message.id
+    message.reply_text(
+        f"*Basic Usage*\n\nSimply add `{ip_addr}/{chat_id}` to your project's webhooks. To get notifictions in groups, add me to your group and use /help.",
+        parse_mode="markdown"
+    )
 
 
 start_handler = CommandHandler("start", start)
 
+help_handler = CommandHandler("help", help)
+
 dispatcher.add_handler(start_handler)
+dispatcher.add_handler(help_handler)
 updater.start_polling()
 
 TG_BOT_API = f'https://api.telegram.org/bot{BOT_TOKEN}/'
 checkbot = get(TG_BOT_API + "getMe").json()
 if not checkbot['ok']:
-    log.error("Invalid Token!")
+    log.error("[ERROR] Invalid Token!")
     exit(1)
 else:
     username = checkbot['result']['username']
     log.info(
-        f"logged in as @{username}")
+        f"[INFO] Logged in as @{username}, waiting for webhook requests...")
 
 
 def post_tg(chat, message, parse_mode):
@@ -96,8 +107,7 @@ def git_api(groupid):
         sender_name = data['sender']['login']
         response = post_tg(
                 groupid,
-                f"🙌 Successfully set webhook for <a href='{repo_url}'>{repo_name}</a>" +
-                "by <a href='{sender_url}'>{sender_name}</a>!",
+                f"🙌 Successfully set webhook for <a href='{repo_url}'>{repo_name}</a> by <a href='{sender_url}'>{sender_name}</a>!",
                 "html"
             )
         return response
@@ -169,9 +179,7 @@ def git_api(groupid):
     if data.get('forkee'):
         response = post_tg(
             groupid,
-            f"🍴 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> forked " +
-            "<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal forks now " +
-            "are {data['repository']['forks_count']}",
+            f"🍴 <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> forked <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!\nTotal forks now are {data['repository']['forks_count']}",
             "html")
         return response
 
@@ -199,32 +207,26 @@ def git_api(groupid):
 
         response = post_tg(
             groupid,
-            f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} " +
-            "<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!",
+            f"<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a> {data['action']} <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>!",
             "html")
         return response
 
     if data.get('ref_type'):
         response = post_tg(
             groupid,
-            f"A new {data['ref_type']} on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> " +
-            "was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+            f"A new {data['ref_type']} on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
             "html")
         return response
 
     if data.get('created'):
         response = post_tg(groupid,
-            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on " +
-            "<a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created" +
-            "by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
     if data.get('deleted'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on" +
-                           " <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was deleted by " +
-                           "<a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was deleted by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
