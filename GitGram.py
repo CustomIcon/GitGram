@@ -21,10 +21,13 @@ if ENV:
     BOT_TOKEN = environ.get('BOT_TOKEN', None)
     PROJECT_NAME = environ.get('PROJECT_NAME', None)
     ip_addr = environ.get('APP_URL', None)
+    # You kanged our project without forking it, we'll get you DMCA'd.
+    GIT_REPO_URL = environ.get('GIT_REPO_URL', "https://github.com/MadeByThePinsHub/GitGram")
 else:
     BOT_TOKEN = config.BOT_TOKEN
     PROJECT_NAME = config.PROJECT_NAME
     ip_addr = get('https://api.ipify.org').text
+    GIT_REPO_URL = config.GIT_REPO_URL
 
 updater = Updater(token=BOT_TOKEN, workers=1)
 dispatcher = updater.dispatcher
@@ -42,19 +45,34 @@ def start(_bot, update):
 def help(_bot, update):
     """/help message for the bot"""
     message = update.effective_message
-    chat_id = message.id
+    chat = update.effective_chat
     message.reply_text(
-        f"*Basic Usage*\n\nSimply add `{ip_addr}/{chat_id}` to your project's webhooks. To get notifictions in groups, add me to your group and use /help.",
+        f"*Available Commands*\n\n`/connect` - Setup how to connect this chat to receive Git activity notifications.\n`/support` - Get links to get support if you're stuck.\n`/source` - Get the Git repository URL.",
         parse_mode="markdown"
     )
 
+def support(_bot, update):
+    """Links to Support"""
+    message = update.effective_message
+    message.reply_text(
+        f"*Getting Support*\n\nTo get support in using the bot, join [the GitGram support](https://t.me/GitGramChat).",
+        parse_mode="markdown"
+    )
+
+def getSourceCodeLink(_bot, update):
+    """Pulls link to the source code."""
+    message = update.effective_message
+    message.reply_text(
+        f"{GIT_REPO_URL}"
+    )
 
 start_handler = CommandHandler("start", start)
-
 help_handler = CommandHandler("help", help)
+supportCmd = CommandHandler("support", support)
 
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(help_handler)
+dispatcher.add_handler(supportCmd)
 updater.start_polling()
 
 TG_BOT_API = f'https://api.telegram.org/bot{BOT_TOKEN}/'
@@ -92,6 +110,11 @@ def reply_tg(chat, message_id, message, parse_mode):
             "disable_web_page_preview": True}).json()
     return response
 
+
+@server.route("/", methods=['GET'])
+# Just send 'Hello, world!' to tell that our server is up.
+def helloWorld():
+    return 'Hello, world!'
 
 @server.route("/<groupid>", methods=['GET', 'POST'])
 def git_api(groupid):
