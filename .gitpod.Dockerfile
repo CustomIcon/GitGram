@@ -2,7 +2,7 @@ FROM gitpod/workspace-full
 
 USER gitpod
 # Installing Required Packages
-RUN sudo apt update && apt upgrade -y && \
+RUN sudo apt update && sudo apt upgrade -y && \
     apt install --no-install-recommends -y \
     bash \
     bzip2 \
