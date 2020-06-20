@@ -91,10 +91,12 @@ def git_api(groupid):
     if data.get('hook'):
         repo_url = data['repository']['html_url']
         repo_name = data['repository']['name']
+        ref_data1 = escape(data['ref'].split('/')[-1])
+        ref_data2 = {escape(data['ref'].split('/')[-2])}
         sender_url = data['sender']['html_url']
         sender_name = data['sender']['login']
         comments = data['comment']['body']
-        commits_data = len(data['commits']
+        commits_data = len(data['commits'])
         comment_url = data['comment']['html_url']
         issue_no = data['issue']['number']
         issue_title = data['issue']['title']
@@ -107,7 +109,6 @@ def git_api(groupid):
                 "html"
             )
         return response
-
     if data.get('commits'):
         commits_text = ""
         rng = commits_data
@@ -121,15 +122,14 @@ def git_api(groupid):
                 commit_msg = escape(commit['message'])
             commits_text += f"{commit_msg}\n<a href='{commit['url']}'>{commit['id'][:7]}</a> - {commit['author']['name']} {escape('<')}{commit['author']['email']}{escape('>')}\n\n"
             if len(commits_text) > 1000:
-                text = f"""✨ <b>{escape(repo_name)}</b> - New {commits_data} commits ({escape(data['ref'].split('/')[-1])})
+                text = f"""✨ <b>{escape(repo_name)}</b> - New {commits_data} commits ({escape(ref_data1)})
 {commits_text}
 """
                 response = post_tg(groupid, text, "html")
                 commits_text = ""
         if not commits_text:
             return jsonify({"ok": True, "text": "Commits text is none"})
-        ref_data = escape(data['ref'].split('/')[-1])
-        text = f"""✨ <b>{repo_name}</b> - New {commits_data} commits ({ref_data})
+        text = f"""✨ <b>{repo_name}</b> - New {commits_data} commits ({ref_data1})
 {commits_text}
 """
         if commits_data > 10:
@@ -217,19 +217,19 @@ def git_api(groupid):
 
     if data.get('created'):
         response = post_tg(groupid,
-            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was created by <a href='{sender_url}'>{sender_name}</a>!",
+            f"Branch {ref_data1} <b>{ref_data2}</b> on <a href='{repo_url}'>{repo_name}</a> was created by <a href='{sender_url}'>{sender_name}</a>!",
                            "html")
         return response
 
     if data.get('deleted'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was deleted by <a href='{sender_url}'>{sender_name}</a>!",
+                           f"Branch {ref_data1} <b>{ref_data2}</b> on <a href='{repo_url}'>{repo_name}</a> was deleted by <a href='{sender_url}'>{sender_name}</a>!",
                            "html")
         return response
 
     if data.get('forced'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was forced by <a href='{sender_url}'>{sender_name}</a>!",
+                           f"Branch {ref_data1} <b>{data['ref'].split('/')[-2]}</b> on <a href='{repo_url}'>{repo_name}</a> was forced by <a href='{sender_url}'>{sender_name}</a>!",
                            "html")
         return response
 
