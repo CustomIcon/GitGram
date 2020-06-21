@@ -39,13 +39,12 @@ def start(_bot, update):
     """/start message for bot"""
     message = update.effective_message
     message.reply_text(
-        f"This is the Updates watcher for {PROJECT_NAME}. I am just notify users about what's happen on their Git repositories thru webhooks.\n\nYou need to [self-host](https://github.com/MadeByThePinsHub/GitGram#readme) or see /help to use this bot on your groups.",
+        f"This is the Updates watcher for {PROJECT_NAME}. I am just notify users about what's happen on their Git repositories thru webhooks.\n\nYou need to [self-host](https://waa.ai/GitGram) or see /help to use this bot on your groups.",
         parse_mode="markdown")
 
 def help(_bot, update):
     """/help message for the bot"""
     message = update.effective_message
-    chat = update.effective_chat
     message.reply_text(
         f"*Available Commands*\n\n`/connect` - Setup how to connect this chat to receive Git activity notifications.\n`/support` - Get links to get support if you're stuck.\n`/source` - Get the Git repository URL.",
         parse_mode="markdown"
@@ -59,6 +58,14 @@ def support(_bot, update):
         parse_mode="markdown"
     )
 
+def source(_bot, update):
+    """Link to Source"""
+    message = update.effective_message
+    message.reply_text(
+        f"*Source*:\n\n[GitGram Repo](https://waa.ai/GitGram).",
+        parse_mode="markdown"
+    )
+
 def getSourceCodeLink(_bot, update):
     """Pulls link to the source code."""
     message = update.effective_message
@@ -69,10 +76,12 @@ def getSourceCodeLink(_bot, update):
 start_handler = CommandHandler("start", start)
 help_handler = CommandHandler("help", help)
 supportCmd = CommandHandler("support", support)
+sourcecode = CommandHandler("source", source)
 
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(help_handler)
 dispatcher.add_handler(supportCmd)
+dispatcher.add_handler(sourcecode)
 updater.start_polling()
 
 TG_BOT_API = f'https://api.telegram.org/bot{BOT_TOKEN}/'
@@ -294,8 +303,8 @@ def git_api(groupid):
     url = deldog(data)
     response = post_tg(
         groupid,
-        f"🚫 Webhook endpoint for this chat has received something that doesn't understood yet. " +
-        "\n\nLink to logs for debugging: {url}",
+        "🚫 Webhook endpoint for this chat has received something that doesn't understood yet. " +
+        f"\n\nLink to logs for debugging: {url}",
         "markdown")
     return response
 
