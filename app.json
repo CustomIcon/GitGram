@@ -1,14 +1,14 @@
 {
     "name": "GitGram",
-    "description": "Github Integration for Telegram Bot API",
+    "description": "GitHub and GitLab Integration for Telegram Bot API",
     "logo": "",
     "keywords": [
         "telegram",
         "github"
     ],
     "repository": "https://github.com/pokurt/GitGram",
-    "website": "https://t.me/LyndaEagleSupport",
-    "success_url": "https://t.me/YorkTownEagleUnion",
+    "website": "https://github.com/pokurt/GitGram",
+    "success_url": "https://t.me/GitGramChat",
     "stack": "container",
     "env": {
         "ENV": {
@@ -23,7 +23,7 @@
             "description": "Project of what you desire",
             "value": ""
         },
-        "ip_addr": {
+        "APP_URL": {
             "description": "Heroku app url, example: https://appname.herokuapp.com",
             "value": ""
         }

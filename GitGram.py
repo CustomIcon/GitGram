@@ -21,39 +21,69 @@ if ENV:
     BOT_TOKEN = environ.get('BOT_TOKEN', None)
     PROJECT_NAME = environ.get('PROJECT_NAME', None)
     ip_addr = environ.get('APP_URL', None)
+    # You kanged our project without forking it, we'll get you DMCA'd.
+    GIT_REPO_URL = environ.get('GIT_REPO_URL', "https://github.com/MadeByThePinsHub/GitGram")
 else:
     BOT_TOKEN = config.BOT_TOKEN
     PROJECT_NAME = config.PROJECT_NAME
     ip_addr = get('https://api.ipify.org').text
+    GIT_REPO_URL = config.GIT_REPO_URL
 
 updater = Updater(token=BOT_TOKEN, workers=1)
 dispatcher = updater.dispatcher
 
-print("If you need more information contact @YorktownEagleUnion")
+print("If you need more help, join @GitGramChat in Telegram.")
 
 
 def start(_bot, update):
     """/start message for bot"""
     message = update.effective_message
     message.reply_text(
-        f"This is the Updates watcher for {PROJECT_NAME}\nYou are not authorized to be here",
+        f"This is the Updates watcher for {PROJECT_NAME}. I am just notify users about what's happen on their Git repositories thru webhooks.\n\nYou need to [self-host](https://github.com/MadeByThePinsHub/GitGram#readme) or see /help to use this bot on your groups.",
         parse_mode="markdown")
 
+def help(_bot, update):
+    """/help message for the bot"""
+    message = update.effective_message
+    chat = update.effective_chat
+    message.reply_text(
+        f"*Available Commands*\n\n`/connect` - Setup how to connect this chat to receive Git activity notifications.\n`/support` - Get links to get support if you're stuck.\n`/source` - Get the Git repository URL.",
+        parse_mode="markdown"
+    )
+
+def support(_bot, update):
+    """Links to Support"""
+    message = update.effective_message
+    message.reply_text(
+        f"*Getting Support*\n\nTo get support in using the bot, join [the GitGram support](https://t.me/GitGramChat).",
+        parse_mode="markdown"
+    )
+
+def getSourceCodeLink(_bot, update):
+    """Pulls link to the source code."""
+    message = update.effective_message
+    message.reply_text(
+        f"{GIT_REPO_URL}"
+    )
 
 start_handler = CommandHandler("start", start)
+help_handler = CommandHandler("help", help)
+supportCmd = CommandHandler("support", support)
 
 dispatcher.add_handler(start_handler)
+dispatcher.add_handler(help_handler)
+dispatcher.add_handler(supportCmd)
 updater.start_polling()
 
 TG_BOT_API = f'https://api.telegram.org/bot{BOT_TOKEN}/'
 checkbot = get(TG_BOT_API + "getMe").json()
 if not checkbot['ok']:
-    log.error("Invalid Token!")
+    log.error("[ERROR] Invalid Token!")
     exit(1)
 else:
     username = checkbot['result']['username']
     log.info(
-        f"logged in as @{username}")
+        f"[INFO] Logged in as @{username}, waiting for webhook requests...")
 
 
 def post_tg(chat, message, parse_mode):
@@ -80,6 +110,11 @@ def reply_tg(chat, message_id, message, parse_mode):
             "disable_web_page_preview": True}).json()
     return response
 
+
+@server.route("/", methods=['GET'])
+# Just send 'Hello, world!' to tell that our server is up.
+def helloWorld():
+    return 'Hello, world!'
 
 @server.route("/<groupid>", methods=['GET', 'POST'])
 def git_api(groupid):
@@ -220,7 +255,9 @@ def git_api(groupid):
 
     if data.get('forced'):
         response = post_tg(groupid,
-                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was forced by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b>" +
+                           " on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was" +
+                           " forced by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
@@ -247,14 +284,18 @@ def git_api(groupid):
             emo = "🌀"
         response = post_tg(
             groupid,
-            f"{emo} <a href='{data['target_url']}'>{data['description']}</a> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!\nLatest commit:\n<a href='{data['commit']['commit']['url']}'>{escape(data['commit']['commit']['message'])}</a>",
+            f"{emo} <a href='{data['target_url']}'>{data['description']}</a>" +
+            " on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a>" +
+            " by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!" +
+            "\nLatest commit:\n<a href='{data['commit']['commit']['url']}'>{escape(data['commit']['commit']['message'])}</a>",
             "html")
         return response
 
     url = deldog(data)
     response = post_tg(
         groupid,
-        f"🚫 Undetected response: {url}",
+        f"🚫 Webhook endpoint for this chat has received something that doesn't understood yet. " +
+        "\n\nLink to logs for debugging: {url}",
         "markdown")
     return response
 

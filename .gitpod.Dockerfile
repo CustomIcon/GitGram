@@ -2,8 +2,8 @@ FROM gitpod/workspace-full
 
 USER gitpod
 # Installing Required Packages
-RUN apt update && apt upgrade -y && \
-    apt install --no-install-recommends -y \
+RUN sudo apt update && sudo apt upgrade -y && \
+    sudo apt install --no-install-recommends -y \
     bash \
     bzip2 \
     curl \
@@ -29,9 +29,9 @@ RUN apt update && apt upgrade -y && \
 # Pypi package Repo upgrade
 RUN pip3 install --upgrade pip setuptools
 
-# Copy Python Requirements to /root/GitGram
-RUN git clone https://github.com/pokurt/GitGram.git /root/GitGram
-WORKDIR /root/GitGram
+# Copy everything to our workspace
+COPY . /workspace/GitGram
+WORKDIR /workspace/GitGram
 
 # Install requirements
 RUN sudo pip3 install -U -r requirements.txt
