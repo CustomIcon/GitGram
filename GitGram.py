@@ -62,7 +62,7 @@ def source(_bot, update):
     """Link to Source"""
     message = update.effective_message
     message.reply_text(
-        f"*Source*:\n\n[GitGram Repo](https://waa.ai/GitGram).",
+        f"*Source*:\n[GitGram Repo](https://waa.ai/GitGram).",
         parse_mode="markdown"
     )
 
