@@ -126,3 +126,10 @@ dmypy.json
 
 # Swap files on using Vi or Vim
 *.swp
+.idea/dictionaries/Aman.xml
+.idea/GitGram.iml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/vcs.xml

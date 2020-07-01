@@ -9,7 +9,6 @@ import config
 
 from telegram.ext import CommandHandler, Updater
 
-
 server = Flask(__name__)
 
 basicConfig(level=INFO)
@@ -42,6 +41,7 @@ def start(_bot, update):
         f"This is the Updates watcher for {PROJECT_NAME}. I am just notify users about what's happen on their Git repositories thru webhooks.\n\nYou need to [self-host](https://waa.ai/GitGram) or see /help to use this bot on your groups.",
         parse_mode="markdown")
 
+
 def help(_bot, update):
     """/help message for the bot"""
     message = update.effective_message
@@ -49,6 +49,7 @@ def help(_bot, update):
         f"*Available Commands*\n\n`/connect` - Setup how to connect this chat to receive Git activity notifications.\n`/support` - Get links to get support if you're stuck.\n`/source` - Get the Git repository URL.",
         parse_mode="markdown"
     )
+
 
 def support(_bot, update):
     """Links to Support"""
@@ -58,6 +59,7 @@ def support(_bot, update):
         parse_mode="markdown"
     )
 
+
 def source(_bot, update):
     """Link to Source"""
     message = update.effective_message
@@ -66,12 +68,14 @@ def source(_bot, update):
         parse_mode="markdown"
     )
 
+
 def getSourceCodeLink(_bot, update):
     """Pulls link to the source code."""
     message = update.effective_message
     message.reply_text(
         f"{GIT_REPO_URL}"
     )
+
 
 start_handler = CommandHandler("start", start)
 help_handler = CommandHandler("help", help)
@@ -125,6 +129,7 @@ def reply_tg(chat, message_id, message, parse_mode):
 def helloWorld():
     return 'Hello, world!'
 
+
 @server.route("/<groupid>", methods=['GET', 'POST'])
 def git_api(groupid):
     """Requests to api.github.com"""
@@ -138,10 +143,10 @@ def git_api(groupid):
         sender_url = data['sender']['html_url']
         sender_name = data['sender']['login']
         response = post_tg(
-                groupid,
-                f"🙌 Successfully set webhook for <a href='{repo_url}'>{repo_name}</a> by <a href='{sender_url}'>{sender_name}</a>!",
-                "html"
-            )
+            groupid,
+            f"🙌 Successfully set webhook for <a href='{repo_url}'>{repo_name}</a> by <a href='{sender_url}'>{sender_name}</a>!",
+            "html"
+        )
         return response
 
     if data.get('commits'):
@@ -252,7 +257,7 @@ def git_api(groupid):
 
     if data.get('created'):
         response = post_tg(groupid,
-            f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
+                           f"Branch {data['ref'].split('/')[-1]} <b>{data['ref'].split('/')[-2]}</b> on <a href='{data['repository']['html_url']}'>{data['repository']['name']}</a> was created by <a href='{data['sender']['html_url']}'>{data['sender']['login']}</a>!",
                            "html")
         return response
 
