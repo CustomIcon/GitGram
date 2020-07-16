@@ -133,3 +133,4 @@ dmypy.json
 .idea/modules.xml
 .idea/misc.xml
 .idea/vcs.xml
+config.py
