@@ -9,7 +9,6 @@
     "repository": "https://github.com/pokurt/GitGram",
     "website": "https://github.com/pokurt/GitGram",
     "success_url": "https://t.me/GitGramChat",
-    "stack": "container",
     "env": {
         "ENV": {
             "description": "Fill this if you using environ variable as config.",
@@ -27,5 +26,13 @@
             "description": "Heroku app url, example: https://appname.herokuapp.com",
             "value": ""
         }
+    },
+    "stack": "heroku-18",
+  "buildpacks": [],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
     }
+  }
   }
