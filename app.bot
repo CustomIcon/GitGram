@@ -1,14 +1,14 @@
 {
-    "name": "GitGram",
+    "name": "POWER-USERBOT",
     "description": "GitHub and GitLab Integration for Telegram Bot API",
     "logo": "",
     "keywords": [
         "telegram",
         "github"
     ],
-    "repository": "https://github.com/pokurt/GitGram",
-    "website": "https://github.com/pokurt/GitGram",
-    "success_url": "https://t.me/GitGramChat",
+    "repository": "https://github.com/apisuserbot/POWER-USERBOT",
+    "website": "https://github.com/apisuserbot/POWER-USERBOT",
+    "success_url": "https://t.me/Power_Userbot_Group",
     "stack": "container",
     "env": {
         "ENV": {
@@ -16,7 +16,7 @@
             "value": "True"
         },
         "BOT_TOKEN": {
-            "description": "Get Bot API Token from @BotFather",
+            "description": "pergi ke Bot API Token  @BotFather yang udah lu bikin tadi",
             "value": ""
         },
         "PROJECT_NAME": {
